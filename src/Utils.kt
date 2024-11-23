@@ -1,21 +1,57 @@
-import java.math.BigInteger
-import java.security.MessageDigest
-import kotlin.io.path.Path
-import kotlin.io.path.readText
+@file:Suppress("unused")
+
+import java.io.File
 
 /**
- * Reads lines from the given input txt file.
+ * Reads from the given input txt file as one string.
  */
-fun readInput(name: String) = Path("src/$name.txt").readText().trim().lines()
+fun readInput(name: String): String = File("src", "$name.txt")
+    .readText()
 
 /**
- * Converts string to md5 hash.
+ * Reads lines from the given input txt file as integers.
  */
-fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray()))
-    .toString(16)
-    .padStart(32, '0')
+fun readInputAsInts(name: String): List<Int> = File("src", "$name.txt")
+    .readLines()
+    .map{it.toInt()}
+
+/**
+ * Reads from the given input txt file as strings split by the given delimiter.
+ */
+fun readInputSplitByDelimiter(name: String, delimiter: String): List<String> = File("src", "$name.txt")
+    .readText()
+    .split(delimiter)
+
+/**
+ * Reads lines from the given input txt file as strings. Can be used to read the input as a grid of characters.
+ */
+fun readInputAsStrings(name: String): List<String> = File("src", "$name.txt")
+    .readLines()
+
+/**
+ * Adds a border with the given character to a grid. Useful when looking for neighbours of points in the input grid.
+ */
+fun addBorderToGrid(input: List<String>, borderCharacter: Char): List<String> {
+    val emptyRow = borderCharacter.toString().repeat(input.first().length)
+    val borderedInput = mutableListOf(emptyRow)
+    for (line in input) {
+        val borderedLine = "$borderCharacter$line$borderCharacter"
+        borderedInput.add(borderedLine)
+    }
+    borderedInput.add(emptyRow)
+    return borderedInput
+}
 
 /**
  * The cleaner shorthand for printing output.
  */
 fun Any?.println() = println(this)
+
+/**
+ * The cleaner shorthand for splitting strings and filtering non-empty values.
+ */
+fun CharSequence.splitIgnoreEmpty(vararg delimiters: String): List<String> {
+    return this.split(*delimiters).filter {
+        it.isNotEmpty()
+    }
+}
