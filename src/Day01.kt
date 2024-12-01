@@ -1,39 +1,24 @@
 fun main() {
-    fun getSortedPairs(input:List<List<String>>): List<Pair<Int, Int>> {
-        val firstList = mutableListOf<Int>()
-        val secondList = mutableListOf<Int>()
-        input.map{
-            firstList.add(it[0].toInt())
-            secondList.add(it[1].toInt())
-        }
-        firstList.sort()
-        secondList.sort()
-        return firstList.zip(secondList)
-    }
-
-    fun getHowOftenANumberAppears(input:List<List<String>>): Pair<Map<Int, Int>, Map<Int, Int>> {
-        val firstList = mutableListOf<Int>()
-        val secondList = mutableListOf<Int>()
-        input.map{
-            firstList.add(it[0].toInt())
-            secondList.add(it[1].toInt())
-        }
-        val groupsFirstList = firstList.groupBy{it}.map{Pair(it.key, it.value.size)}.toMap()
-        val groupsSecondList = secondList.groupBy{it}.map{Pair(it.key, it.value.size)}.toMap()
-        return Pair(groupsFirstList, groupsSecondList)
+    fun getLists(input: List<List<String>>): Pair<List<Int>, List<Int>> {
+        val (firstList, secondList) = input.map{ it[0].toInt() to it[1].toInt() }.unzip()
+        return Pair(firstList, secondList)
     }
 
     fun part1(input: List<List<String>>): Long {
-        val pairs = getSortedPairs(input)
+        val (firstList, secondList) = getLists(input)
+        val pairs = firstList.sorted().zip(secondList.sorted())
         return pairs.fold(0){acc, it -> acc + distanceTo(it.first, it.second)}
     }
 
     fun part2(input: List<List<String>>): Long {
-        val (firstList, secondList) = getHowOftenANumberAppears(input)
+        val (firstList, secondList) = getLists(input)
+        val idAppearancesFirstList = firstList.groupBy{it}.map{Pair(it.key, it.value.size)}.toMap()
+        val idAppearancesSecondList = secondList.groupBy{it}.map{Pair(it.key, it.value.size)}.toMap()
+
         var sum = 0L
-        for (item in firstList) {
-            if (secondList.keys.contains(item.key)) {
-                sum += (item.key * item.value * secondList[item.key]!!)
+        for (item in idAppearancesFirstList) {
+            if (idAppearancesSecondList.containsKey(item.key)) {
+                sum += (item.key * item.value * idAppearancesSecondList.getOrDefault(item.key, 0))
             }
         }
         return sum
