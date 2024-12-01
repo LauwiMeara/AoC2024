@@ -1,21 +1,45 @@
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
+    fun getSortedPairs(input:List<List<String>>): List<Pair<Int, Int>> {
+        val firstList = mutableListOf<Int>()
+        val secondList = mutableListOf<Int>()
+        input.map{
+            firstList.add(it[0].toInt())
+            secondList.add(it[1].toInt())
+        }
+        firstList.sort()
+        secondList.sort()
+        return firstList.zip(secondList)
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun getHowOftenANumberAppears(input:List<List<String>>): Pair<Map<Int, Int>, Map<Int, Int>> {
+        val firstList = mutableListOf<Int>()
+        val secondList = mutableListOf<Int>()
+        input.map{
+            firstList.add(it[0].toInt())
+            secondList.add(it[1].toInt())
+        }
+        val groupsFirstList = firstList.groupBy{it}.map{Pair(it.key, it.value.size)}.toMap()
+        val groupsSecondList = secondList.groupBy{it}.map{Pair(it.key, it.value.size)}.toMap()
+        return Pair(groupsFirstList, groupsSecondList)
     }
 
-    // Test if implementation meets criteria from the description, like:
-    check(part1(listOf("test_input")) == 1)
+    fun part1(input: List<List<String>>): Long {
+        val pairs = getSortedPairs(input)
+        return pairs.fold(0){acc, it -> acc + distanceTo(it.first, it.second)}
+    }
 
-    // Or read a large test input from the `src/Day01_test.txt` file:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
+    fun part2(input: List<List<String>>): Long {
+        val (firstList, secondList) = getHowOftenANumberAppears(input)
+        var sum = 0L
+        for (item in firstList) {
+            if (secondList.keys.contains(item.key)) {
+                sum += (item.key * item.value * secondList[item.key]!!)
+            }
+        }
+        return sum
+    }
 
-    // Read the input from the `src/Day01.txt` file.
-    val input = readInput("Day01")
+    val input = readInputAsStrings("Day01").map { it.split("   ")}
     part1(input).println()
     part2(input).println()
 }

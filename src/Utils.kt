@@ -1,6 +1,7 @@
 @file:Suppress("unused")
 
 import java.io.File
+import kotlin.math.abs
 
 /**
  * Reads from the given input txt file as one string.
@@ -41,6 +42,8 @@ fun addBorderToGrid(input: List<String>, borderCharacter: Char): List<String> {
     borderedInput.add(emptyRow)
     return borderedInput
 }
+
+fun distanceTo(a: Int, b: Int): Int = abs(a - b)
 
 /**
  * The cleaner shorthand for printing output.
