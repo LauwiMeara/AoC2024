@@ -12,8 +12,8 @@ fun main() {
 
     fun part2(input: List<List<String>>): Long {
         val (firstList, secondList) = getLists(input)
-        val idAppearancesFirstList = firstList.groupBy { it }.map { Pair(it.key, it.value.size) }.toMap()
-        val idAppearancesSecondList = secondList.groupBy { it }.map { Pair(it.key, it.value.size) }.toMap()
+        val idAppearancesFirstList = firstList.groupingBy { it }.eachCount()
+        val idAppearancesSecondList = secondList.groupingBy { it }.eachCount()
 
         var sum = 0L
         for (item in idAppearancesFirstList) {
