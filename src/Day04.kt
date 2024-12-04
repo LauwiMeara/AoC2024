@@ -1,7 +1,7 @@
 fun main() {
-    fun getIndicesOf(input: List<String>, letter: Char): List<List<Int>> {
-        return input.map {
-            it.mapIndexedNotNull { i, c -> if (c == letter) i else null }
+    fun getIndicesOf(input: List<String>, letter: Char): List<Adjacent2D.Position> {
+        return input.flatMapIndexed { indexX, it ->
+            it.mapIndexedNotNull { indexY, c -> if (c == letter) Adjacent2D.Position(indexX, indexY) else null }
         }
     }
 
@@ -28,18 +28,16 @@ fun main() {
     fun part1(input: List<String>): Int {
         var sum = 0
         val indices = getIndicesOf(input, 'X')
-        indices.indices.forEach { x ->
-            indices[x].forEach { y ->
-                Adjacent2D.cardinalsAndDiagonals.forEach { direction ->
-                    if (fitsInGrid(
-                            input.size,
-                            input[0].length,
-                            x + (direction.value.x * 3),
-                            y + (direction.value.y * 3)
-                        ) && spellsMAS(input, x, y, direction.value)
-                    ) {
-                        sum += 1
-                    }
+        indices.forEach {
+            Adjacent2D.cardinalsAndDiagonals.forEach { direction ->
+                if (fitsInGrid(
+                        input.size,
+                        input[0].length,
+                        it.x + (direction.value.x * 3),
+                        it.y + (direction.value.y * 3)
+                    ) && spellsMAS(input, it.x, it.y, direction.value)
+                ) {
+                    sum += 1
                 }
             }
         }
@@ -49,15 +47,12 @@ fun main() {
     fun part2(input: List<String>): Int {
         var sum = 0
         val indices = getIndicesOf(input, 'A')
-        indices.indices.forEach { x ->
-            indices[x].forEach { y ->
-                if (fitsInGrid(input.size, input[0].length, x - 1, y - 1) &&
-                    fitsInGrid(input.size, input[0].length, x + 1, y + 1)
-                ) {
-                    if (isCrossedMAS(input, x, y)) {
-                        sum += 1
-                    }
-                }
+        indices.forEach {
+            if (fitsInGrid(input.size, input[0].length, it.x - 1, it.y - 1) &&
+                fitsInGrid(input.size, input[0].length, it.x + 1, it.y + 1) &&
+                isCrossedMAS(input, it.x, it.y)
+            ) {
+                sum += 1
             }
         }
         return sum
