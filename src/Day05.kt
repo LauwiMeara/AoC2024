@@ -1,12 +1,13 @@
 fun main() {
-    data class PageOrderingRule(val page: Int, val followingPages: List<Int>)
-
     val newLine = System.lineSeparator()
 
     fun getRulesAndPageUpdates(input: List<String>): Pair<Map<Int, List<Int>>, List<List<Int>>> {
-        val rules = input[0].split(newLine).map { it.split("|") }
-            .map { pages -> PageOrderingRule(pages[0].toInt(), listOf(pages[1].toInt())) }.groupBy { it.page }
-            .map { it.key to it.value.flatMap { page -> page.followingPages } }.toMap()
+        val rules = input[0]
+            .split(newLine)
+            .map { it.split("|").map { pageNumber -> pageNumber.toInt() } }
+            .groupBy { it[0] }
+            .map { it.key to it.value.map { page -> page[1] } }
+            .toMap()
         val pages = input[1].split(newLine).map { it.split(",").map { page -> page.toInt() } }
         return Pair(rules, pages)
     }
