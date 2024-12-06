@@ -1,7 +1,7 @@
 fun main() {
-    fun getIndicesOf(input: List<String>, letter: Char): List<Adjacent2D.Position> {
+    fun getIndicesOf(input: List<String>, letter: Char): List<Grid2D.Position> {
         return input.flatMapIndexed { indexX, it ->
-            it.mapIndexedNotNull { indexY, c -> if (c == letter) Adjacent2D.Position(indexX, indexY) else null }
+            it.mapIndexedNotNull { indexY, c -> if (c == letter) Grid2D.Position(indexX, indexY) else null }
         }
     }
 
@@ -9,7 +9,7 @@ fun main() {
         return x in 0..<maxX && y in 0..<maxY
     }
 
-    fun spellsMAS(input: List<String>, x: Int, y: Int, relativePosition: Adjacent2D.Position): Boolean {
+    fun spellsMAS(input: List<String>, x: Int, y: Int, relativePosition: Grid2D.Position): Boolean {
         return input[x + relativePosition.x][y + relativePosition.y] == 'M' &&
                 input[x + (relativePosition.x * 2)][y + relativePosition.y * 2] == 'A' &&
                 input[x + (relativePosition.x * 3)][y + relativePosition.y * 3] == 'S'
@@ -17,19 +17,19 @@ fun main() {
 
     fun isCrossedMAS(input: List<String>, x: Int, y: Int): Boolean {
         val neighbours =
-            Adjacent2D.diagonals.map { it.key to input[x + it.value.x][y + it.value.y] }
+            Grid2D.diagonals.map { it.key to input[x + it.value.x][y + it.value.y] }
                 .toMap()
-        return (neighbours[Adjacent2D.Direction.NORTHWEST] == 'M' && neighbours[Adjacent2D.Direction.SOUTHWEST] == 'M' && neighbours[Adjacent2D.Direction.NORTHEAST] == 'S' && neighbours[Adjacent2D.Direction.SOUTHEAST] == 'S') ||
-                (neighbours[Adjacent2D.Direction.NORTHWEST] == 'M' && neighbours[Adjacent2D.Direction.NORTHEAST] == 'M' && neighbours[Adjacent2D.Direction.SOUTHWEST] == 'S' && neighbours[Adjacent2D.Direction.SOUTHEAST] == 'S') ||
-                (neighbours[Adjacent2D.Direction.SOUTHEAST] == 'M' && neighbours[Adjacent2D.Direction.NORTHEAST] == 'M' && neighbours[Adjacent2D.Direction.NORTHWEST] == 'S' && neighbours[Adjacent2D.Direction.SOUTHWEST] == 'S') ||
-                (neighbours[Adjacent2D.Direction.SOUTHEAST] == 'M' && neighbours[Adjacent2D.Direction.SOUTHWEST] == 'M' && neighbours[Adjacent2D.Direction.NORTHWEST] == 'S' && neighbours[Adjacent2D.Direction.NORTHEAST] == 'S')
+        return (neighbours[Grid2D.Direction.NORTHWEST] == 'M' && neighbours[Grid2D.Direction.SOUTHWEST] == 'M' && neighbours[Grid2D.Direction.NORTHEAST] == 'S' && neighbours[Grid2D.Direction.SOUTHEAST] == 'S') ||
+                (neighbours[Grid2D.Direction.NORTHWEST] == 'M' && neighbours[Grid2D.Direction.NORTHEAST] == 'M' && neighbours[Grid2D.Direction.SOUTHWEST] == 'S' && neighbours[Grid2D.Direction.SOUTHEAST] == 'S') ||
+                (neighbours[Grid2D.Direction.SOUTHEAST] == 'M' && neighbours[Grid2D.Direction.NORTHEAST] == 'M' && neighbours[Grid2D.Direction.NORTHWEST] == 'S' && neighbours[Grid2D.Direction.SOUTHWEST] == 'S') ||
+                (neighbours[Grid2D.Direction.SOUTHEAST] == 'M' && neighbours[Grid2D.Direction.SOUTHWEST] == 'M' && neighbours[Grid2D.Direction.NORTHWEST] == 'S' && neighbours[Grid2D.Direction.NORTHEAST] == 'S')
     }
 
     fun part1(input: List<String>): Int {
         var sum = 0
         val indices = getIndicesOf(input, 'X')
         indices.forEach {
-            Adjacent2D.cardinalsAndDiagonals.forEach { direction ->
+            Grid2D.cardinalsAndDiagonals.forEach { direction ->
                 if (fitsInGrid(
                         input.size,
                         input[0].length,

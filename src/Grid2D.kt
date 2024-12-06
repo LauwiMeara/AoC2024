@@ -1,4 +1,4 @@
-data object Adjacent2D {
+data object Grid2D {
     enum class Direction {
         NORTH,
         NORTHEAST,
@@ -10,7 +10,17 @@ data object Adjacent2D {
         NORTHWEST,
     }
 
-    data class Position(val x: Int, val y: Int)
+    val directionSymbols = mapOf(
+        Direction.NORTH to '^',
+        Direction.EAST to '>',
+        Direction.SOUTH to 'v',
+        Direction.WEST to '<'
+    )
+
+    data class Position(val x: Int, val y: Int) {
+        operator fun plus(other: Position): Position =
+            Position(x + other.x, y + other.y)
+    }
 
     val cardinals = mapOf(
         Direction.NORTH to Position(-1, 0),
