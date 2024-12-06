@@ -14,7 +14,7 @@ fun readInput(name: String): String = File("src", "$name.txt")
  */
 fun readInputAsInts(name: String): List<Int> = File("src", "$name.txt")
     .readLines()
-    .map{it.toInt()}
+    .map { it.toInt() }
 
 /**
  * Reads from the given input txt file as strings split by the given delimiter.
