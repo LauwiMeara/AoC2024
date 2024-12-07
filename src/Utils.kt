@@ -58,3 +58,9 @@ fun CharSequence.splitIgnoreEmpty(vararg delimiters: String): List<String> {
         it.isNotEmpty()
     }
 }
+
+/**
+ * Get all possible permutations of a string. Usage: "abc".permute()
+ */
+fun String.permute(result: String = ""): List<String> =
+    if (isEmpty()) listOf(result) else flatMapIndexed { i, c -> removeRange(i, i + 1).permute(result + c) }.distinct()
