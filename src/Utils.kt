@@ -51,7 +51,7 @@ fun distanceTo(a: Int, b: Int): Int = abs(a - b)
 /**
  * Checks if the given x and y fit in the grid. The grid can be specified by min (optional, default is 0) and max (required) values.
  */
-fun fitsInGrid(maxX: Int, maxY: Int, x: Int, y: Int, minX: Int = 0, minY: Int = 0): Boolean {
+fun fitsInGrid(x: Int, y: Int, maxX: Int, maxY: Int, minX: Int = 0, minY: Int = 0): Boolean {
     return x in minX..maxX && y in minY..maxY
 }
 

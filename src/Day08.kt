@@ -43,12 +43,12 @@ fun main() {
         val yDifference = firstPosition.y - secondPosition.y
 
         var antiNode = Grid2D.Position(firstPosition.x - xDifference, firstPosition.y - yDifference)
-        while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
+        while (fitsInGrid(antiNode.x, antiNode.y, maxX, maxY)) {
             antiNodes.add(antiNode)
             antiNode = Grid2D.Position(antiNode.x - xDifference, antiNode.y - yDifference)
         }
         antiNode = Grid2D.Position(secondPosition.x + xDifference, secondPosition.y + yDifference)
-        while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
+        while (fitsInGrid(antiNode.x, antiNode.y, maxX, maxY)) {
             antiNodes.add(antiNode)
             antiNode = Grid2D.Position(antiNode.x + xDifference, antiNode.y + yDifference)
         }
@@ -65,12 +65,13 @@ fun main() {
         val antiNodesSet = mutableSetOf<Grid2D.Position>()
         for (i in 0..<positions.size - 1) {
             for (j in i + 1..<positions.size) {
-                val antiNodes = if (isPart2) {
-                    getAntiNodesForPairPart2(positions[i], positions[j], maxX, maxY)
+                if (isPart2) {
+                    val antiNodes = getAntiNodesForPairPart2(positions[i], positions[j], maxX, maxY)
+                    antiNodesSet.addAll(antiNodes)
                 } else {
-                    getAntiNodesForPair(positions[i], positions[j])
+                    val antiNodes = getAntiNodesForPair(positions[i], positions[j])
+                    antiNodesSet.addAll(antiNodes.filter { fitsInGrid(it.x, it.y, maxX, maxY) })
                 }
-                antiNodesSet.addAll(antiNodes.filter { fitsInGrid(maxX, maxY, it.x, it.y) })
             }
         }
         return antiNodesSet

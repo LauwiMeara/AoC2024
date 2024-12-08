@@ -27,10 +27,10 @@ fun main() {
         indices.forEach {
             Grid2D.cardinalsAndDiagonals.forEach { direction ->
                 if (fitsInGrid(
-                        input.size - 1,
-                        input[0].length - 1,
                         it.x + (direction.value.x * 3),
-                        it.y + (direction.value.y * 3)
+                        it.y + (direction.value.y * 3),
+                        input.size - 1,
+                        input[0].length - 1
                     ) && spellsMAS(input, it.x, it.y, direction.value)
                 ) {
                     sum += 1
@@ -44,8 +44,8 @@ fun main() {
         var sum = 0
         val indices = getIndicesOf(input, 'A')
         indices.forEach {
-            if (fitsInGrid(input.size - 1, input[0].length - 1, it.x - 1, it.y - 1) &&
-                fitsInGrid(input.size - 1, input[0].length - 1, it.x + 1, it.y + 1) &&
+            if (fitsInGrid(it.x - 1, it.y - 1, input.size - 1, input[0].length - 1) &&
+                fitsInGrid(it.x + 1, it.y + 1, input.size - 1, input[0].length - 1) &&
                 isCrossedMAS(input, it.x, it.y)
             ) {
                 sum += 1
