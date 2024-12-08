@@ -18,28 +18,18 @@ fun main() {
         val antiNodes = mutableSetOf<Grid2D.Position>()
         val xDifference = firstPosition.x - secondPosition.x
         val yDifference = firstPosition.y - secondPosition.y
+
         var antiNode = Grid2D.Position(firstPosition.x - xDifference, firstPosition.y - yDifference)
-        if (!antiNode.equals(secondPosition)) {
+        if (antiNode != secondPosition) {
             antiNodes.add(antiNode)
             antiNodes.add(Grid2D.Position(secondPosition.x + xDifference, secondPosition.y + yDifference))
-        }
-        antiNode = Grid2D.Position(firstPosition.x + xDifference, firstPosition.y + yDifference)
-        if (!antiNode.equals(secondPosition)) {
+        } else {
+            antiNode = Grid2D.Position(firstPosition.x + xDifference, firstPosition.y + yDifference)
             antiNodes.add(antiNode)
             antiNodes.add(Grid2D.Position(secondPosition.x - xDifference, secondPosition.y - yDifference))
         }
-        return antiNodes
-    }
 
-    fun getAntiNodesSet(positions: List<Grid2D.Position>): Set<Grid2D.Position> {
-        val antiNodesSet = mutableSetOf<Grid2D.Position>()
-        for (i in 0..<positions.size - 1) {
-            for (j in i + 1..<positions.size) {
-                val antiNodes = getAntiNodesForPair(positions[i], positions[j])
-                antiNodes.forEach { antiNodesSet.add(it) }
-            }
-        }
-        return antiNodesSet
+        return antiNodes
     }
 
     fun getAntiNodesForPairPart2(
@@ -51,55 +41,51 @@ fun main() {
         val antiNodes = mutableSetOf(firstPosition, secondPosition)
         val xDifference = firstPosition.x - secondPosition.x
         val yDifference = firstPosition.y - secondPosition.y
+
         var antiNode = Grid2D.Position(firstPosition.x - xDifference, firstPosition.y - yDifference)
-        if (!antiNode.equals(secondPosition)) {
-            while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
-                antiNodes.add(antiNode)
-                antiNode = Grid2D.Position(antiNode.x - xDifference, antiNode.y - yDifference)
-            }
-            antiNode = Grid2D.Position(secondPosition.x + xDifference, secondPosition.y + yDifference)
-            while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
-                antiNodes.add(antiNode)
-                antiNode = Grid2D.Position(antiNode.x + xDifference, antiNode.y + yDifference)
-            }
+        while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
+            antiNodes.add(antiNode)
+            antiNode = Grid2D.Position(antiNode.x - xDifference, antiNode.y - yDifference)
         }
-        antiNode = Grid2D.Position(firstPosition.x + xDifference, firstPosition.y + yDifference)
-        if (!antiNode.equals(secondPosition)) {
-            while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
-                antiNodes.add(antiNode)
-                antiNode = Grid2D.Position(antiNode.x + xDifference, antiNode.y + yDifference)
-            }
-            antiNode = Grid2D.Position(secondPosition.x + xDifference, secondPosition.y + yDifference)
-            while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
-                antiNodes.add(antiNode)
-                antiNode = Grid2D.Position(antiNode.x - xDifference, antiNode.y - yDifference)
-            }
+        antiNode = Grid2D.Position(secondPosition.x + xDifference, secondPosition.y + yDifference)
+        while (antiNode.x in 0..maxX && antiNode.y in 0..maxY) {
+            antiNodes.add(antiNode)
+            antiNode = Grid2D.Position(antiNode.x + xDifference, antiNode.y + yDifference)
         }
+
         return antiNodes
     }
 
-    fun getAntiNodesSetPart2(positions: List<Grid2D.Position>, maxX: Int, maxY: Int): Set<Grid2D.Position> {
+    fun getAntiNodesSet(
+        positions: List<Grid2D.Position>,
+        maxX: Int,
+        maxY: Int,
+        isPart2: Boolean = false
+    ): Set<Grid2D.Position> {
         val antiNodesSet = mutableSetOf<Grid2D.Position>()
         for (i in 0..<positions.size - 1) {
             for (j in i + 1..<positions.size) {
-                val antiNodes = getAntiNodesForPairPart2(positions[i], positions[j], maxX, maxY)
-                antiNodes.forEach { antiNodesSet.add(it) }
+                val antiNodes = if (isPart2) {
+                    getAntiNodesForPairPart2(positions[i], positions[j], maxX, maxY)
+                } else {
+                    getAntiNodesForPair(positions[i], positions[j])
+                }
+                antiNodesSet.addAll(antiNodes.filter { fitsInGrid(maxX, maxY, it.x, it.y) })
             }
         }
         return antiNodesSet
     }
 
     fun part1(input: List<String>): Int {
+        val maxX = input.size - 1
+        val maxY = input[0].length - 1
         val antennasPerFrequency = getAntennas(input)
         val antiNodesSet = mutableSetOf<Grid2D.Position>()
         for (frequency in antennasPerFrequency.keys) {
-            val antiNodes = getAntiNodesSet(antennasPerFrequency[frequency]!!.map { it.position })
-            antiNodes.forEach { antiNodesSet.add(it) }
+            val antiNodes = getAntiNodesSet(antennasPerFrequency[frequency]!!.map { it.position }, maxX, maxY)
+            antiNodesSet.addAll(antiNodes)
         }
-
-        val maxX = input.size - 1
-        val maxY = input[0].length - 1
-        return antiNodesSet.filter { it.x in 0..maxX && it.y in 0..maxY }.size
+        return antiNodesSet.size
     }
 
     fun part2(input: List<String>): Int {
@@ -108,10 +94,9 @@ fun main() {
         val antennasPerFrequency = getAntennas(input)
         val antiNodesSet = mutableSetOf<Grid2D.Position>()
         for (frequency in antennasPerFrequency.keys) {
-            val antiNodes = getAntiNodesSetPart2(antennasPerFrequency[frequency]!!.map { it.position }, maxX, maxY)
-            antiNodes.forEach { antiNodesSet.add(it) }
+            val antiNodes = getAntiNodesSet(antennasPerFrequency[frequency]!!.map { it.position }, maxX, maxY, true)
+            antiNodesSet.addAll(antiNodes)
         }
-
         return antiNodesSet.size
     }
 

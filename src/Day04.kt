@@ -5,10 +5,6 @@ fun main() {
         }
     }
 
-    fun fitsInGrid(maxX: Int, maxY: Int, x: Int, y: Int): Boolean {
-        return x in 0..<maxX && y in 0..<maxY
-    }
-
     fun spellsMAS(input: List<String>, x: Int, y: Int, relativePosition: Grid2D.Position): Boolean {
         return input[x + relativePosition.x][y + relativePosition.y] == 'M' &&
                 input[x + (relativePosition.x * 2)][y + relativePosition.y * 2] == 'A' &&
@@ -31,8 +27,8 @@ fun main() {
         indices.forEach {
             Grid2D.cardinalsAndDiagonals.forEach { direction ->
                 if (fitsInGrid(
-                        input.size,
-                        input[0].length,
+                        input.size - 1,
+                        input[0].length - 1,
                         it.x + (direction.value.x * 3),
                         it.y + (direction.value.y * 3)
                     ) && spellsMAS(input, it.x, it.y, direction.value)
@@ -48,8 +44,8 @@ fun main() {
         var sum = 0
         val indices = getIndicesOf(input, 'A')
         indices.forEach {
-            if (fitsInGrid(input.size, input[0].length, it.x - 1, it.y - 1) &&
-                fitsInGrid(input.size, input[0].length, it.x + 1, it.y + 1) &&
+            if (fitsInGrid(input.size - 1, input[0].length - 1, it.x - 1, it.y - 1) &&
+                fitsInGrid(input.size - 1, input[0].length - 1, it.x + 1, it.y + 1) &&
                 isCrossedMAS(input, it.x, it.y)
             ) {
                 sum += 1
