@@ -1,33 +1,23 @@
 fun main() {
+    val freeSpace = "."
+
+    fun charToInt(c: Char): Int {
+        return c.code - 48
+    }
+
     fun getDisk(input: String): List<List<String>> {
         val disk = mutableListOf<List<String>>()
-        var id = -1
         for (i in input.indices) {
-            val number = input[i].code - 48
-            if (i % 2 == 0) {
-                id++
-                if (number == 0) continue
-                val file = id.toString()
-                val files = mutableListOf<String>()
-                for (n in 1..number) {
-                    files.add(file)
-                }
-                disk.add(files)
-            } else {
-                if (number == 0) continue
-                val freeSpace = "."
-                val freeSpaces = mutableListOf<String>()
-                for (n in 1..number) {
-                    freeSpaces.add(freeSpace)
-                }
-                disk.add(freeSpaces)
-            }
+            val number = charToInt(input[i])
+            if (number == 0) continue
+            val block = (1..number).map { if (i % 2 == 0) (i / 2).toString() else freeSpace }
+            disk.add(block)
         }
         return disk
     }
 
     fun trimDisk(disk: List<List<String>>): List<List<String>> {
-        while (disk.last().all { it == "." }) {
+        while (disk.last().all { it == freeSpace }) {
             return trimDisk(disk.dropLast(1))
         }
         return disk
@@ -35,64 +25,73 @@ fun main() {
 
     fun moveFile(disk: List<List<String>>): List<List<String>> {
         val file = disk.last().last()
-        val indexList = disk.indexOfFirst { it.contains(".") }
-        val indexFreeSpace = disk[indexList].indexOfFirst { it == "." }
-        val newList = disk[indexList].toMutableList()
-        newList[indexFreeSpace] = file
+        val indexBlockWithFreeSpace = disk.indexOfFirst { it.contains(freeSpace) }
+        val indexFreeSpace = disk[indexBlockWithFreeSpace].indexOfFirst { it == freeSpace }
+
+        val newBlock = disk[indexBlockWithFreeSpace].toMutableList()
+        newBlock[indexFreeSpace] = file
+        val oldBlock = disk.last().toMutableList().dropLast(1)
+
         val newDisk = disk.toMutableList()
-        newDisk[indexList] = newList
-        newDisk[newDisk.size - 1] = newDisk[newDisk.size - 1].dropLast(1)
+        newDisk[indexBlockWithFreeSpace] = newBlock
+        newDisk[newDisk.size - 1] = oldBlock
+
         return trimDisk(newDisk)
     }
 
-    fun moveFileBlock(disk: List<List<String>>, fileNumber: Int): List<List<String>> {
+    fun moveBlock(disk: List<List<String>>, fileNumber: Int): List<List<String>> {
         val indexFileBlockToMove = disk.indexOfLast { it.contains(fileNumber.toString()) }
         var sizeFileBlockToMove = disk[indexFileBlockToMove].size
-        val indexFreeSpace = disk.indexOfFirst { it.count { c -> c == "." } >= sizeFileBlockToMove }
+        val indexFreeSpace = disk.indexOfFirst { it.count { c -> c == freeSpace } >= sizeFileBlockToMove }
+
         if (indexFreeSpace == -1 || indexFreeSpace > indexFileBlockToMove) return disk
-        val newDisk = disk.toMutableList()
-        val newList = mutableListOf<String>()
-        for (s in disk[indexFreeSpace]) {
-            if (s != ".") {
-                newList.add(s)
-            } else if (sizeFileBlockToMove > 0) {
-                newList.add(fileNumber.toString())
+
+        val newBlock = mutableListOf<String>()
+        disk[indexFreeSpace].forEach {
+            if (sizeFileBlockToMove == 0 || it != freeSpace) {
+                newBlock.add(it)
+            } else {
+                newBlock.add(fileNumber.toString())
                 sizeFileBlockToMove--
-            } else {
-                newList.add(".")
             }
         }
-        newDisk[indexFreeSpace] = newList
-        val oldList = mutableListOf<String>()
-        for (s in disk[indexFileBlockToMove]) {
-            if (s == fileNumber.toString()) {
-                oldList.add(".")
+
+        val oldBlock = mutableListOf<String>()
+        disk[indexFileBlockToMove].forEach {
+            if (it == fileNumber.toString()) {
+                oldBlock.add(freeSpace)
             } else {
-                oldList.add(s)
+                oldBlock.add(it)
             }
         }
-        newDisk[indexFileBlockToMove] = oldList
+
+        val newDisk = disk.toMutableList()
+        newDisk[indexFreeSpace] = newBlock
+        newDisk[indexFileBlockToMove] = oldBlock
         return newDisk
     }
 
     fun part1(input: String): Long {
         var disk = getDisk(input)
-        while (disk.any { it.contains(".") }) {
+        while (disk.any { it.contains(freeSpace) }) {
             disk = moveFile(disk)
         }
-        val map = disk.flatten().mapIndexed { i, it -> Pair(i.toLong(), it) }
-        return map.fold(0L) { acc, it -> acc + (it.first * it.second.toLong()) }
+        return disk
+            .flatten()
+            .mapIndexed { i, it -> Pair(i.toLong(), it) }
+            .fold(0L) { acc, it -> acc + (it.first * it.second.toLong()) }
     }
 
     fun part2(input: String): Long {
         var disk = getDisk(input)
         val maxFileNumber = disk.flatten().max().toInt()
-
-        for (fileNumber in maxFileNumber downTo 0) {
-            disk = moveFileBlock(disk, fileNumber)
+        (maxFileNumber downTo 0).forEach {
+            disk = moveBlock(disk, it)
         }
-        val map = disk.flatten().mapIndexed { i, it -> if (it == ".") Pair(i.toLong(), "0") else Pair(i.toLong(), it) }
-        return map.fold(0L) { acc, it -> acc + (it.first * it.second.toLong()) }
+        return disk
+            .flatten()
+            .mapIndexed { i, it -> if (it == freeSpace) Pair(i.toLong(), "0") else Pair(i.toLong(), it) }
+            .fold(0L) { acc, it -> acc + (it.first * it.second.toLong()) }
     }
 
     val input = readInput("Day09")
