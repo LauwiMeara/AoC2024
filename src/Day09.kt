@@ -9,7 +9,7 @@ fun main() {
                 if (number == 0) continue
                 val file = id.toString()
                 val files = mutableListOf<String>()
-                for (i in 1..number) {
+                for (n in 1..number) {
                     files.add(file)
                 }
                 disk.add(files)
@@ -17,7 +17,7 @@ fun main() {
                 if (number == 0) continue
                 val freeSpace = "."
                 val freeSpaces = mutableListOf<String>()
-                for (i in 1..number) {
+                for (n in 1..number) {
                     freeSpaces.add(freeSpace)
                 }
                 disk.add(freeSpaces)
