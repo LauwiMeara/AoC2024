@@ -45,6 +45,36 @@ fun main() {
         return trimDisk(newDisk)
     }
 
+    fun moveFileBlock(disk: List<List<String>>, fileNumber: Int): List<List<String>> {
+        val indexFileBlockToMove = disk.indexOfLast { it.contains(fileNumber.toString()) }
+        var sizeFileBlockToMove = disk[indexFileBlockToMove].size
+        val indexFreeSpace = disk.indexOfFirst { it.count { c -> c == "." } >= sizeFileBlockToMove }
+        if (indexFreeSpace == -1 || indexFreeSpace > indexFileBlockToMove) return disk
+        val newDisk = disk.toMutableList()
+        val newList = mutableListOf<String>()
+        for (s in disk[indexFreeSpace]) {
+            if (s != ".") {
+                newList.add(s)
+            } else if (sizeFileBlockToMove > 0) {
+                newList.add(fileNumber.toString())
+                sizeFileBlockToMove--
+            } else {
+                newList.add(".")
+            }
+        }
+        newDisk[indexFreeSpace] = newList
+        val oldList = mutableListOf<String>()
+        for (s in disk[indexFileBlockToMove]) {
+            if (s == fileNumber.toString()) {
+                oldList.add(".")
+            } else {
+                oldList.add(s)
+            }
+        }
+        newDisk[indexFileBlockToMove] = oldList
+        return newDisk
+    }
+
     fun part1(input: String): Long {
         var disk = getDisk(input)
         while (disk.any { it.contains(".") }) {
@@ -54,11 +84,18 @@ fun main() {
         return map.fold(0L) { acc, it -> acc + (it.first * it.second.toLong()) }
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun part2(input: String): Long {
+        var disk = getDisk(input)
+        val maxFileNumber = disk.flatten().max().toInt()
+
+        for (fileNumber in maxFileNumber downTo 0) {
+            disk = moveFileBlock(disk, fileNumber)
+        }
+        val map = disk.flatten().mapIndexed { i, it -> if (it == ".") Pair(i.toLong(), "0") else Pair(i.toLong(), it) }
+        return map.fold(0L) { acc, it -> acc + (it.first * it.second.toLong()) }
     }
 
     val input = readInput("Day09")
     part1(input).println()
-//    part2(input).println()
+    part2(input).println()
 }
