@@ -205,22 +205,26 @@ fun main() {
     fun getNextGuardPart2(
         input: List<MutableList<Char>>,
         guard: Guard,
+        visitedPositions: MutableSet<Grid2D.Position>,
         panel: GuardPanel? = null
-    ): Pair<Guard?, Set<Grid2D.Position>> {
+    ): Triple<Guard?, Set<Grid2D.Position>, Set<Grid2D.Position>> {
         val obstaclePositionsToGetStuck = mutableSetOf<Grid2D.Position>()
         when (guard.direction) {
             Grid2D.Direction.NORTH -> {
                 for (x in guard.position.x downTo 1) {
                     if (input[x - 1][guard.position.y] == '#') {
-                        return Pair(
+                        return Triple(
                             Guard(Grid2D.Direction.EAST, Grid2D.Position(x, guard.position.y)),
-                            obstaclePositionsToGetStuck
+                            obstaclePositionsToGetStuck,
+                            visitedPositions
                         )
                     }
                     input[x - 1][guard.position.y] = directionSymbols[Grid2D.Direction.NORTH]!!
 
                     // Hypothetical situation with a block placed. Would the guard get stuck (in other words: use more than the randomly chosen high amount of turns)?
-                    if (obstaclePositionsToGetStuck.contains(Grid2D.Position(x - 1, guard.position.y))) continue
+                    visitedPositions.add(Grid2D.Position(x, guard.position.y))
+                    val nextPosition = Grid2D.Position(x - 1, guard.position.y)
+                    if (visitedPositions.contains(nextPosition) || obstaclePositionsToGetStuck.contains(nextPosition)) continue
                     val copiedInput = getCopiedInput(input)
                     copiedInput[x - 1][guard.position.y] = '#'
                     var turns = copiedInput.size * copiedInput[0].size
@@ -228,7 +232,7 @@ fun main() {
                         Guard(Grid2D.Direction.EAST, Grid2D.Position(x, guard.position.y))
                     while (copiedGuard != null) {
                         if (turns == 0) {
-                            obstaclePositionsToGetStuck.add(Grid2D.Position(x - 1, guard.position.y))
+                            obstaclePositionsToGetStuck.add(nextPosition)
                             break
                         }
                         copiedGuard = getNextGuard(copiedInput, copiedGuard, panel)
@@ -243,15 +247,18 @@ fun main() {
             Grid2D.Direction.EAST -> {
                 for (y in guard.position.y..<input[guard.position.x].size - 1) {
                     if (input[guard.position.x][y + 1] == '#') {
-                        return Pair(
+                        return Triple(
                             Guard(Grid2D.Direction.SOUTH, Grid2D.Position(guard.position.x, y)),
-                            obstaclePositionsToGetStuck
+                            obstaclePositionsToGetStuck,
+                            visitedPositions
                         )
                     }
                     input[guard.position.x][y + 1] = directionSymbols[Grid2D.Direction.EAST]!!
 
                     // Hypothetical situation with a block placed. Would the guard get stuck (in other words: use more than the randomly chosen high amount of turns)?
-                    if (obstaclePositionsToGetStuck.contains(Grid2D.Position(guard.position.x, y + 1))) continue
+                    visitedPositions.add(Grid2D.Position(guard.position.x, y))
+                    val nextPosition = Grid2D.Position(guard.position.x, y + 1)
+                    if (visitedPositions.contains(nextPosition) || obstaclePositionsToGetStuck.contains(nextPosition)) continue
                     val copiedInput = getCopiedInput(input)
                     copiedInput[guard.position.x][y + 1] = '#'
                     var turns = copiedInput.size * copiedInput[0].size
@@ -259,7 +266,7 @@ fun main() {
                         Guard(Grid2D.Direction.SOUTH, Grid2D.Position(guard.position.x, y))
                     while (copiedGuard != null) {
                         if (turns == 0) {
-                            obstaclePositionsToGetStuck.add(Grid2D.Position(guard.position.x, y + 1))
+                            obstaclePositionsToGetStuck.add(nextPosition)
                             break
                         }
                         copiedGuard = getNextGuard(copiedInput, copiedGuard, panel)
@@ -274,15 +281,18 @@ fun main() {
             Grid2D.Direction.SOUTH -> {
                 for (x in guard.position.x..<input.size - 1) {
                     if (input[x + 1][guard.position.y] == '#') {
-                        return Pair(
+                        return Triple(
                             Guard(Grid2D.Direction.WEST, Grid2D.Position(x, guard.position.y)),
-                            obstaclePositionsToGetStuck
+                            obstaclePositionsToGetStuck,
+                            visitedPositions
                         )
                     }
                     input[x + 1][guard.position.y] = directionSymbols[Grid2D.Direction.SOUTH]!!
 
                     // Hypothetical situation with a block placed. Would the guard get stuck (in other words: use more than the randomly chosen high amount of turns)?
-                    if (obstaclePositionsToGetStuck.contains(Grid2D.Position(x + 1, guard.position.y))) continue
+                    visitedPositions.add(Grid2D.Position(x, guard.position.y))
+                    val nextPosition = Grid2D.Position(x + 1, guard.position.y)
+                    if (visitedPositions.contains(nextPosition) || obstaclePositionsToGetStuck.contains(nextPosition)) continue
                     val copiedInput = getCopiedInput(input)
                     copiedInput[x + 1][guard.position.y] = '#'
                     var turns = copiedInput.size * copiedInput[0].size
@@ -290,7 +300,7 @@ fun main() {
                         Guard(Grid2D.Direction.WEST, Grid2D.Position(x, guard.position.y))
                     while (copiedGuard != null) {
                         if (turns == 0) {
-                            obstaclePositionsToGetStuck.add(Grid2D.Position(x + 1, guard.position.y))
+                            obstaclePositionsToGetStuck.add(nextPosition)
                             break
                         }
                         copiedGuard = getNextGuard(copiedInput, copiedGuard, panel)
@@ -305,15 +315,18 @@ fun main() {
             Grid2D.Direction.WEST -> {
                 for (y in guard.position.y downTo 1) {
                     if (input[guard.position.x][y - 1] == '#') {
-                        return Pair(
+                        return Triple(
                             Guard(Grid2D.Direction.NORTH, Grid2D.Position(guard.position.x, y)),
-                            obstaclePositionsToGetStuck
+                            obstaclePositionsToGetStuck,
+                            visitedPositions
                         )
                     }
                     input[guard.position.x][y - 1] = directionSymbols[Grid2D.Direction.WEST]!!
 
                     // Hypothetical situation with a block placed. Would the guard get stuck (in other words: use more than the randomly chosen high amount of turns)?
-                    if (obstaclePositionsToGetStuck.contains(Grid2D.Position(guard.position.x, y - 1))) continue
+                    visitedPositions.add(Grid2D.Position(guard.position.x, y))
+                    val nextPosition = Grid2D.Position(guard.position.x, y - 1)
+                    if (visitedPositions.contains(nextPosition) || obstaclePositionsToGetStuck.contains(nextPosition)) continue
                     val copiedInput = getCopiedInput(input)
                     copiedInput[guard.position.x][y - 1] = '#'
                     var turns = copiedInput.size * copiedInput[0].size
@@ -321,7 +334,7 @@ fun main() {
                         Guard(Grid2D.Direction.NORTH, Grid2D.Position(guard.position.x, y))
                     while (copiedGuard != null) {
                         if (turns == 0) {
-                            obstaclePositionsToGetStuck.add(Grid2D.Position(guard.position.x, y - 1))
+                            obstaclePositionsToGetStuck.add(nextPosition)
                             break
                         }
                         copiedGuard = getNextGuard(copiedInput, copiedGuard, panel)
@@ -333,9 +346,9 @@ fun main() {
                 }
             }
 
-            else -> return Pair(null, obstaclePositionsToGetStuck)
+            else -> return Triple(null, obstaclePositionsToGetStuck, visitedPositions)
         }
-        return Pair(null, obstaclePositionsToGetStuck)
+        return Triple(null, obstaclePositionsToGetStuck, visitedPositions)
     }
 
     fun part1(input: List<MutableList<Char>>, visualize: Boolean = false): Int {
@@ -357,11 +370,18 @@ fun main() {
         val panel = if (visualize) GuardPanel(input) else null
         if (panel != null) createFrame(panel, input)
         val newObstaclePositions = mutableSetOf<Grid2D.Position>()
+        val allVisitedPositions = mutableSetOf<Grid2D.Position>()
         var guard: Guard? = getInitialGuard(input)!!
         while (guard != null) {
-            val (nextGuard, obstaclePositionsToGetStuck) = getNextGuardPart2(input, guard!!, panel)
+            val (nextGuard, obstaclePositionsToGetStuck, visitedPositions) = getNextGuardPart2(
+                input,
+                guard!!,
+                allVisitedPositions,
+                panel
+            )
             guard = nextGuard
             newObstaclePositions.addAll(obstaclePositionsToGetStuck)
+            allVisitedPositions.addAll(visitedPositions)
         }
         return newObstaclePositions.size
     }
