@@ -23,6 +23,9 @@ data object Grid2D {
         operator fun plus(other: Position): Position =
             Position(x + other.x, y + other.y)
 
+        operator fun times(number: Int): Position =
+            Position(x * number, y * number)
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other !is Position) return false
