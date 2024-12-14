@@ -37,6 +37,30 @@ data object Grid2D {
         }
     }
 
+    data class LongPosition(val x: Long, val y: Long) {
+        operator fun plus(other: LongPosition): LongPosition =
+            LongPosition(x + other.x, y + other.y)
+
+        operator fun times(number: Long): LongPosition =
+            LongPosition(x * number, y * number)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other is Position) {
+                return this.x == other.x.toLong() && this.y == other.y.toLong()
+            }
+            if (other is LongPosition) {
+                return this.x == other.x && this.y == other.y
+
+            }
+            return false
+        }
+
+        override fun hashCode(): Int {
+            return Objects.hash(x, y)
+        }
+    }
+
     val cardinals = mapOf(
         Direction.NORTH to Position(-1, 0),
         Direction.EAST to Position(0, 1),
