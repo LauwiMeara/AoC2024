@@ -61,6 +61,8 @@ data object Grid2D {
         }
     }
 
+    // BEWARE: the x- and y-axis are reversed! Haven't changed that to keep earlier days working.
+
     val cardinals = mapOf(
         Direction.NORTH to Position(-1, 0),
         Direction.EAST to Position(0, 1),
